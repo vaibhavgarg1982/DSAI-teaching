@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 data = load_iris()['data']
+# Normalize each sample so distance is driven by direction/relative feature scale.
 data = data/np.linalg.norm(data, axis=1).reshape(-1, 1)
 data = [list(point) for point in list(data)]
 targets = ["" for _ in range(len(data))]
@@ -12,9 +13,10 @@ num_clusters = 3
 num_points = len(data)
 num_features = len(data[0])
 
-# randomly select 3 points as the initial centroids
+# 1) Initialization: pick K random data points as starting centroids.
 centroids = random.sample(list(data), num_clusters)
 for i in range(20):
+    # 2) Assignment step: assign each point to its nearest centroid.
     closest_centroids={}
     for j , datum in enumerate(data):
         dist = []
@@ -25,9 +27,13 @@ for i in range(20):
         closest_centroids[closest_centroid] = closest_centroids.get(closest_centroid, []) + [datum]
         targets[j] = closest_centroid
 
+    # 3) Update step: move each centroid to the mean of its assigned points.
     for x in  closest_centroids:
         new_centroid = ([sum(i)/len(closest_centroids[x]) for i in zip(*closest_centroids[x])])
         centroids[x] = new_centroid
+
+    # 4) Convergence note: this version runs a fixed number of iterations (20)
+    # instead of stopping early when centroid movement becomes very small.
 
 print(centroids)
 print(targets)
