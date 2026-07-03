@@ -50,7 +50,7 @@ Target Python in this project: `>=3.14`.
 	jupyter notebook
 	```
 
-Notes:
+## Printable Notes:
 ![FC](<1 page notes v2.png>)
 
 ![CNN](<CNN 1 page v2.png>)
