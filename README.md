@@ -12,9 +12,12 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - `grad_des.ipynb` and `man_grad_des.ipynb`: gradient descent intuition and manual derivation walkthroughs
 - `man_grad_des.html`: exported version of manual gradient descent notes
 - `kmeans_scratch.py`: K-means implemented from scratch with annotated steps
+- `colab filtering and k means demo.ipynb`: K-means and filtering walkthrough
 - `fashionMnistFC.ipynb`: Fashion-MNIST classification with a fully connected network
 - `fashionMnistCNN copy.ipynb`: CNN-based Fashion-MNIST classification
 - `audio-spectrogram.ipynb`: early experiments showing audio as image-like/spectrogram data
+- `transfer_learning_ft.ipynb`: transfer learning and fine-tuning experiments (ResNet18 with `timm`)
+- `Post CNN Notes.ipynb`: post-CNN notes, including batch normalization, classic CV architectures, and Adam/EWMA bias-correction math
 - `titanic_age_demo.ipynb` and `titanic- mlai3.ipynb`: Titanic dataset examples
 - `mlai-2.ipynb`: additional ML/AI tutorial notebook
 
@@ -23,6 +26,7 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - `data/FashionMNIST/raw/*`: local Fashion-MNIST files
 - `titanic.csv`: Titanic sample data
 - `image_50000.csv`: image-related sample data used in demos
+- `freesound_community-g-open-thumb-mid-soft-26660.wav`: sample audio file used in spectrogram/audio experiments
 
 ## Environment
 
