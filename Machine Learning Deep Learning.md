@@ -48,16 +48,21 @@
 
 # Neural Networks
 
+* **Perceptron** - Single linear neuron + activation for binary decisions.
 * **Neuron** - Weighted sum + activation.
 * **Weight** - Trainable coefficient.
 * **Bias** - Trainable offset.
 * **Parameter** - Weight or bias.
 * **Hyperparameter** - User-chosen setting.
+* **Decision Boundary** - Surface separating predicted classes.
+* **Linear Separability** - Classes separable by one line/hyperplane.
+* **XOR Problem** - Not linearly separable; needs hidden layer/nonlinearity.
 * **Layer** - Collection of neurons.
 * **Hidden Layer** - Internal computation.
 * **Output Layer** - Final prediction.
 * **Fully Connected Layer** - Every input connects to every output.
 * **MLP / Feedforward Network/ FC network** - Stack of fully connected layers.
+* **Universal Approximation** - Wide enough MLP can approximate many continuous functions.
 
 ---
 
@@ -101,9 +106,16 @@
 
 * **Gradient** - Direction of steepest increase.
 * **Gradient Descent** - Move opposite gradient.
+* **Batch GD** - One update using the full dataset.
+* **Mini-batch GD** - One update using a small batch.
+* **SGD (true online)** - One update per single sample.
 * **Learning Rate** - Step size.
 * **Optimizer** - Updates parameters.
+* **Computational Graph** - Graph of operations for autodiff.
 * **Backpropagation** - Compute gradients by chain rule.
+* **Chain Rule** - Derivative of composed functions.
+* **Jacobian** - Matrix of partial derivatives for vector outputs.
+* **Hadamard Product** - Element-wise multiplication of equal-shape tensors.
 * **Automatic Differentiation** - Automatic gradient computation.
 * **Convergence** - Optimization stabilizes.
 * **Local Minimum** - Nearby optimum.
@@ -167,8 +179,10 @@ $$
 
 # Initialization
 
+* **Random Initialization** - Start weights with small random values.
 * **Xavier / Glorot Init** - Good default for tanh/sigmoid-like setups.
 * **Kaiming / He Init** - Good default for ReLU-like activations.
+* **Symmetry Breaking** - Random init prevents identical neuron learning.
 * **Goal of Init** - Keep activation/gradient scales stable across layers.
 
 ---
@@ -182,6 +196,7 @@ $$
 * **Confusion Matrix** - Count TP, FP, TN, FN by class.
 * **ROC Curve** - TPR vs FPR across thresholds.
 * **AUC** - Area under ROC curve.
+* **Learning Curve** - Train/validation metric vs epochs or data size.
 
 ---
 
@@ -189,7 +204,10 @@ $$
 
 * **CNN** - Learn spatial features from images.
 * **Convolution** - Sliding filter over input.
+* **Local Receptive Field** - Each neuron sees a local input patch.
+* **Sparse Connectivity** - Connect locally, not to every input pixel.
 * **Kernel / Filter** - Learnable convolution weights.
+* **Weight Sharing** - Same filter reused across spatial positions.
 * **Stride** - Step size of filter movement.
 * **Padding** - Border extension for shape control.
 * **Feature Map** - Convolution output tensor.
@@ -202,6 +220,10 @@ $$
 * **Depthwise Convolution** - One filter per input channel.
 * **Pointwise Convolution** - $1\times1$ convolution across channels.
 * **Depthwise Separable Convolution** - Depthwise + pointwise for efficiency.
+* **Translation Invariance** - Features remain useful under small shifts.
+* **Representation Learning** - Network learns useful internal representations.
+* **Feature Learning** - Learn features automatically from data.
+* **Hierarchical Features** - Early layers: edges/textures, deeper: semantics.
 
 ---
 
