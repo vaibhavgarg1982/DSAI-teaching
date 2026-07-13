@@ -200,7 +200,7 @@ class NamesDataset(Dataset):
 #########################
 #Here we can load our example data into the ``NamesDataset``
 
-alldata = NamesDataset("data/names")
+alldata = NamesDataset("D:\\NeuralNetworks-ML-AI\\char-rnn\\data\\names")
 print(f"loaded {len(alldata)} items of data")
 print(f"example = {alldata[0]}")
 
