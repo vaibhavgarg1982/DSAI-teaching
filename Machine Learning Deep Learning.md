@@ -30,7 +30,8 @@
 * **Standardization** - Zero mean, unit variance (common in tabular).
 * **One-Hot Encoding** - Categories to binary vectors.
 * **Missing Value Imputation** - Fill NaN with median/mean.
-* **Stratified Split** - Keep class ratio similar across splits.
+* **Stratified Split** - Keep class ratio similar across splits. That is, split fairly across classes, so that each class is represented in train/val/test sets in the same proportion as the original dataset. Also, make sure that some accidental data leakage does not occur.
+Example, alphabatically arranged names, split alphabatically can cluster Muslim names in w, x y and z disproportionately in the test set.
 
 ---
 
@@ -144,8 +145,8 @@ $$
 * **RMSProp** - Running squared gradients.
 * **Adam** - Momentum + RMSProp.
 * **AdamW** - Adam with decoupled weight decay.
-* **EWMA** - Exponentially weighted moving average.
-* **Bias Correction** - Remove early-step EWMA bias.
+* **EWMA** - Exponentially weighted moving average. $\beta w_i + (1-\beta)w_{i-1}$
+* **Bias Correction** - Remove early-step EWMA bias. $\hat{w}_i = \frac{w_i}{1-\beta^i}$
 
 ---
 
