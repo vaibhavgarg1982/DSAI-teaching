@@ -6,6 +6,38 @@ import torch
 from torch import nn
 
 
+def load_experiment_track(filepath, map_location=None):
+    """Load experiment data from a safe dict checkpoint.
+
+    New checkpoints are plain dictionaries. If a legacy checkpoint is loaded,
+    this function converts it into the same dictionary shape when possible.
+    """
+    payload = torch.load(filepath, map_location=map_location, weights_only=False)
+
+    if isinstance(payload, dict) and payload.get("format") == "experiment_track_v2":
+        return payload
+
+    # Best-effort conversion for legacy objects saved as CallbackContext.
+    if hasattr(payload, "epoch") and hasattr(payload, "train_loss") and hasattr(payload, "val_loss"):
+        model_state = None
+        model_obj = getattr(payload, "model", None)
+        if model_obj is not None and hasattr(model_obj, "state_dict"):
+            model_state = model_obj.state_dict()
+
+        return {
+            "format": "experiment_track_legacy_converted",
+            "epoch": int(payload.epoch),
+            "train_loss": float(payload.train_loss),
+            "val_loss": float(payload.val_loss),
+            "stop_training": bool(getattr(payload, "stop_training", False)),
+            "best_state": getattr(payload, "best_state", None),
+            "model_state_dict": model_state,
+            "extra": {},
+        }
+
+    return payload
+
+
 # ==========================================================
 # Callback Context
 # ==========================================================
@@ -146,18 +178,23 @@ class ModelCheckpoint(Callback):
             torch.save(ctx.model.state_dict(), self.filepath)
 
 class ExperimentTrack(Callback):
-    ''' Save full context ctx at the end of training'''
+    """Save experiment context as a plain dictionary checkpoint."""
 
     def __init__(self, filepath):
         self.filepath = filepath
     
     def on_train_end(self, ctx, **kwargs):
-
-        # Fetch any additional keyword arguments passed to the callback
-        for key, value in kwargs.items():
-            setattr(ctx, key, value)
-
-        torch.save(ctx, self.filepath)
+        payload = {
+            "format": "experiment_track_v2",
+            "epoch": int(ctx.epoch),
+            "train_loss": float(ctx.train_loss),
+            "val_loss": float(ctx.val_loss),
+            "stop_training": bool(ctx.stop_training),
+            "best_state": ctx.best_state,
+            "model_state_dict": ctx.model.state_dict(),
+            "extra": kwargs,
+        }
+        torch.save(payload, self.filepath)
     
 
 
