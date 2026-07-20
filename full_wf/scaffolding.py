@@ -251,3 +251,22 @@ class Trainer:
             cb.on_train_end(ctx)
 
         return ctx
+
+
+#### To read the experiment track, you can use the following code snippet:
+
+# import importlib
+# import torch
+# import full_wf.scaffolding as scaffolding_mod
+
+# # Refresh module in case scaffolding.py was edited after kernel start.
+# importlib.reload(scaffolding_mod)
+# from full_wf.scaffolding import load_experiment_track
+
+# track = load_experiment_track("experiment_track.pth", map_location="cpu")
+# print(track["format"])
+# print(f"Loaded epoch: {track['epoch']}, val_loss: {track['val_loss']:.4f}")
+
+# # Optional: restore weights into a model with matching architecture
+# if track.get("model_state_dict") is not None:
+#     print("Model state_dict is available in track['model_state_dict']")
