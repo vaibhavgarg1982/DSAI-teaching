@@ -11,3 +11,5 @@ wheels/
 data/*
 char-rnn/data/*
 experiment_track.pth
+image_classifier/data/*
+image_classifier/*.pth
