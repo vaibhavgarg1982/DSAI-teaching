@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import copy
 import torch
 from torch import nn
+from torch.utils.data import DataLoader
 
 
 def load_experiment_track(filepath, map_location=None):
@@ -236,6 +237,85 @@ class Trainer:
                 y_val_pred = self.model(Xval)
                 val_loss = self.criterion(y_val_pred, yval)
                 ctx.val_loss = float(val_loss.item())
+
+            for cb in self.callbacks:
+                cb.on_epoch_end(ctx)
+
+            if ctx.stop_training:
+                print(f"Early stopping at epoch {epoch}")
+                break
+
+        if ctx.best_state is not None:
+            self.model.load_state_dict(ctx.best_state)
+
+        for cb in self.callbacks:
+            cb.on_train_end(ctx)
+
+        return ctx
+
+
+class DataLoaderTrainer:
+
+    def __init__(self, model, optimizer, criterion, callbacks=None):
+        self.model = model
+        self.optimizer = optimizer
+        self.criterion = criterion
+        self.callbacks = list(callbacks) if callbacks is not None else []
+
+    def _validate_loader(self, loader, name):
+        if not isinstance(loader, DataLoader):
+            raise TypeError(f"{name} must be a torch.utils.data.DataLoader")
+
+    def _run_epoch(self, loader, training):
+        total_loss = 0.0
+        total_examples = 0
+
+        if training:
+            self.model.train()
+            context = torch.enable_grad()
+        else:
+            self.model.eval()
+            context = torch.no_grad()
+
+        with context:
+            for Xbatch, ybatch in loader:
+                batch_size = Xbatch.shape[0]
+
+                if training:
+                    self.optimizer.zero_grad()
+
+                y_pred = self.model(Xbatch)
+                loss = self.criterion(y_pred, ybatch)
+
+                if training:
+                    loss.backward()
+                    self.optimizer.step()
+
+                total_loss += float(loss.item()) * batch_size
+                total_examples += batch_size
+
+        if total_examples == 0:
+            raise ValueError("DataLoader must contain at least one batch with data.")
+
+        return total_loss / total_examples
+
+    def fit(self, train_loader, val_loader, epochs):
+        self._validate_loader(train_loader, "train_loader")
+        self._validate_loader(val_loader, "val_loader")
+
+        ctx = CallbackContext(model=self.model, epoch=0, train_loss=float("nan"), val_loss=float("nan"))
+
+        for cb in self.callbacks:
+            cb.on_train_begin(ctx)
+
+        for epoch in range(epochs):
+            ctx.epoch = epoch
+
+            for cb in self.callbacks:
+                cb.on_epoch_begin(ctx)
+
+            ctx.train_loss = self._run_epoch(train_loader, training=True)
+            ctx.val_loss = self._run_epoch(val_loader, training=False)
 
             for cb in self.callbacks:
                 cb.on_epoch_end(ctx)
