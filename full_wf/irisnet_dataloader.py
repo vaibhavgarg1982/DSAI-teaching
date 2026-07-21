@@ -85,3 +85,21 @@ plt.legend()
 plt.show()
 
 torch.save(model.state_dict(), 'iris_model_dataloader.pth')
+
+def calc_accuracy(model, data_loader):
+    model.eval()
+    correct = 0
+    total = 0
+    with torch.no_grad():
+        for inputs, labels in data_loader:
+            outputs = model(inputs)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+    return correct / total
+
+train_acc = calc_accuracy(model, train_loader)
+val_acc = calc_accuracy(model, val_loader)
+
+print(f"Train Accuracy: {train_acc:.4f}")
+print(f"Validation Accuracy: {val_acc:.4f}")
