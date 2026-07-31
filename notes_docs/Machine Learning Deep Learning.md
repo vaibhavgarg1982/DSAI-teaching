@@ -342,6 +342,22 @@ $$
 
 ---
 
+# Advanced Topics
+
+* **Hessian** - Matrix of Second-order derivatives for optimization. useful for Newton's method, saddle point detection, and curvature analysis.
+* **Newton's Method** - Second-order optimization using Hessian.
+* **Saddle Point** - Neither minimum nor maximum; can slow optimization.
+* **Eigenvalues** - Indicate curvature along eigenvectors; negative eigenvalue indicates a direction of descent.
+* **Curvature** - Second derivative; indicates how steeply a function bends.
+* **Momentum** - Accumulate past gradients to smooth updates.
+* **Covariate Shift** - Distribution change between training and inference.
+* **KL-Divergence** - Kullback-Leibler divergence; measure of the difference between two probability distributions.
+* **Latent Representation** - Hidden features learned by a model. Can be used as an embedding for downstream tasks or for visualization.
+* **Ablation Study** - Systematic removal of components to assess their impact on performance.
+* **Autoencoder** - Neural network that learns to compress and reconstruct data, often used for dimensionality reduction or anomaly detection.
+
+
+
 # Universal Training Loop
 
 1. Forward pass
