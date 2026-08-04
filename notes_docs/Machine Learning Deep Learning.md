@@ -64,6 +64,7 @@ Example, alphabatically arranged names, split alphabatically can cluster Muslim 
 * **Fully Connected Layer** - Every input connects to every output.
 * **MLP / Feedforward Network/ FC network** - Stack of fully connected layers.
 * **Universal Approximation** - Wide enough MLP can approximate many continuous functions.
+* **Embeddings** - Dense vector representations of discrete items (words, users, items). These are learned during training and capture semantic relationships in the data.
 
 ---
 
