@@ -13,3 +13,4 @@ char-rnn/data/*
 experiment_track.pth
 0700_image_classifier/data/*
 0700_image_classifier/*.pth
+runs/*
