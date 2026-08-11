@@ -37,6 +37,7 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 -  Tracking loss and accuracy over epochs
 -  Training, validation and test set discipline
 -  Why loss functions and metric that matters might be different.
+-  Data leakage, example of audio classification and spectrograms project, where test set included random spectrograms from the raw set, which implied (since there was an overlap by design) that it was being evaluated on data already seen by the model during training. This led to 98%+ accuracy on the test set, which was misleading and not representative of real-world performance.
 
 ### `0000_grad_des.ipynb`
 - defining and evaluating loss functions for optimization
