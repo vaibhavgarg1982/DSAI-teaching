@@ -386,3 +386,16 @@ $$
 * **Deep Learning** - Learn complex functions with layered representations.
 * **Everything is Function Approximation** - Fit $\hat f(x)$ by minimizing loss.
 * **Everything is Optimization** - Update parameters to reduce loss.
+
+
+
+
+| Task / loss                 | "Ignorant" prediction                        |                   Expected baseline |
+| --------------------------- | -------------------------------------------- | ----------------------------------: |
+| Binary BCE                  | (p=0.5)                                      |                        (\ln2=0.693) |
+| (K)-class CE                | uniform (p=1/K)                              |                             (\ln K) |
+| Binary BCE, class prior (p) | constant (p)                                 |                              (H(p)) |
+| MSE                         | predict 0, standardized target               |                                 (1) |
+| MSE                         | predict target mean                          |             (\operatorname{Var}(y)) |
+| MAE                         | predict target median                        | mean absolute deviation from median |
+| Gaussian NLL                | depends on assumed variance/parameterization |                  no universal value |
