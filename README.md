@@ -262,3 +262,33 @@ Target Python in this project: `>=3.14`.
 
 ![CNN](<notes_docs/CNN 1 page v2.png>)
 
+## Progression
+1. Session 1 - Machine learning classification, classification based on learning methods, Slope(gradient)
+
+2. Session 2 - Matrix multiplication as affine functions, chain rule, functions, composition, composition of affine functions. Scalar, vector, tensor. 
+
+3. Session 3 - gradient descent, hadamard product, L2 norm and frobenious norm.
+
+4. Session 4 - Machine Learning  libraries ,bias, MSE , MAE. 
+
+5. Session 5 - functions, optimization, loss functions, gradient descent, manual demo with linear data, inference and training, generalisability of loss functions. OOPs basics.
+
+6. Session 6 - Extend with pytorch concepts, Autograd, optim.SGD, MSE loss etc.
+
+7. Session 7 - Neuron , Universal Approximation theorem, Brief of Historical milestones in field of NN, XOR problem, Selection of non linearity, Sigmoid function.
+
+8. Session 8 - Common Non Linear Activations( Sigmoid, tanh, ReLU, leakage ReLU, ELU, Soft Max), IRIS data set, Multi Layer NN, basic FC/dense, Multi class classification, nll and cross entropy loss.
+
+9. Session 9 - Numerical Data, Catagorical ( Ordinal and Non-Ordinal) Data, One-Hot encoding, Drop First, Train set, validation/dev set, Test set, Overfitting,  Under-fitting, Fan-In, Fan-Out.
+
+10. Session 10 - Titanic data set, handling of missing data, stratify and deterministic randomisation in train-test split, F1 Score, Precision and recall.
+
+11. Session 11 - end to end MLP design, overfit and underfit, Regularisation, L2 reg and weight decay.
+
+12. Session 12 - Unsupervised learning use cases, Dimensionality reduction, wine dataset, SVD and PCA, Auto encoder, Auto encoder as anomaly detection.
+
+13. Session 13 - Clustering (K- means) , anomaly detection, Multivariate Gaussian, Recommendation engine, collaborative filtering.
+
+14. Session 14 - Collaborative Filtering, Dataset and dataloaders introduction.
+
+15. Session 15 - Exponentially Weighted Moving average(EWMA), momentum, RMSProp, Adam, Adam with decoupled weights (AdamW), Image representation,  training a FC model with Fashion-MNIST image data set after flatten, concepts of spatial invariance violation in FC for images
