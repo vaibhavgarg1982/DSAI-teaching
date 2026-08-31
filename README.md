@@ -292,3 +292,14 @@ Target Python in this project: `>=3.14`.
 14. Session 14 - Collaborative Filtering, Dataset and dataloaders introduction.
 
 15. Session 15 - Exponentially Weighted Moving average(EWMA), momentum, RMSProp, Adam, Adam with decoupled weights (AdamW), Image representation,  training a FC model with Fashion-MNIST image data set after flatten, concepts of spatial invariance violation in FC for images
+
+### A few Recommended papers and references that came up during the course of the sessions
+https://arxiv.org/pdf/1802.01528v3.pdf - The Matrix Calculus You Need For Deep Learning
+https://arxiv.org/pdf/1604.06737.pdf - Entity Embeddings of Categorical Variables
+https://arxiv.org/pdf/1706.03762.pdf - Attention Is All You Need
+https://arxiv.org/pdf/1512.03385v1.pdf - Deep Residual Learning for Image Recognition
+https://arxiv.org/pdf/1502.03167.pdf - Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift
+https://arxiv.org/pdf/2003.05991.pdf - Autoencoders
+https://arxiv.org/pdf/1805.11604 - How Does Batch Normalization Help Optimization?
+https://arxiv.org/pdf/1708.07120 - Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates
+https://arxiv.org/pdf/1812.01187.pdf - Bag of Tricks for Image Classification with Convolutional Neural Networks
