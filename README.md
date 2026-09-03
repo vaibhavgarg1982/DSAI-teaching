@@ -13,19 +13,27 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 
 - `0000_grad_des.ipynb`: gradient descent foundations
 - `0100_man_grad_des.ipynb`: manual gradient derivation walkthrough
+- `0120_common_activations_non_linearities.ipynb`: activation functions and nonlinearities
 - `0125_class_objects.ipynb`: Python class/object refresher used in examples
 - `0150_mlai-2.ipynb`: intermediate ML tutorial notebook
 - `0175_titanic_rf_overfit_underfit.ipynb`: random forest overfit/underfit demo
 - `0200_titanic- mlai3.ipynb`: Titanic modeling notebook
+- `0200_titanic-overunder.ipynb`: Titanic neural-network overfit/underfit demo
 - `0250_titanic_age_demo.ipynb`: feature engineering and age-focused Titanic demo
-- `0300_kmeans_scratch.py`: K-means from scratch with annotated steps
+- `0300_dimensionality_reduction.ipynb`: SVD and PCA dimensionality-reduction walkthrough
+- `0301_dimensionality_reduction_autoenc.ipynb`: autoencoder-based dimensionality reduction
+- `0305_kmeans_scratch.py`: K-means from scratch with annotated steps
+- `0308_anomaly_gaussian.ipynb`: multivariate Gaussian anomaly detection
 - `0310_colab filtering and k means demo.ipynb`: filtering + K-means walkthrough
 - `0400_fashionMnistFC.ipynb`: Fashion-MNIST fully connected model
 - `0410_dsdl.ipynb`: additional deep learning tutorial content
 - `0500_fashionMnistCNN copy.ipynb`: Fashion-MNIST CNN model
 - `0510_convolutions.ipynb`: convolution intuition and implementation examples
 - `0600_transfer_learning_ft.ipynb`: transfer learning and fine-tuning experiments
+- `0800_char_rnn.ipynb`: character-level language modeling with manual RNN and PyTorch LSTM examples
 - `0900_Refactoring_training_callbacks.ipynb`: training loop/callback refactoring notes
+- `0901_tensorboard.ipynb`: TensorBoard experiment tracking
+- `0999_MMR.ipynb`: Max Marginal Relevance retrieval reranking
 - `audio-spectrogram.ipynb`: spectrogram experiments for audio-as-image intuition
 - `PINN_basic_demo.ipynb`: introductory PINN (Physics-Informed Neural Network) demo
 
@@ -120,6 +128,25 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - evaluating predictions with correlation and scatter plots
 - interpreting predicted-versus-actual plots for model quality
 
+### `0300_dimensionality_reduction.ipynb`
+
+- singular value decomposition (SVD) and its low-rank approximation
+- principal component analysis (PCA) for projecting data into fewer dimensions
+- selecting the number of components using explained variance
+- visualizing reduced-dimensional data
+
+### `0301_dimensionality_reduction_autoenc.ipynb`
+
+- encoder-decoder networks for dimensionality reduction
+- latent-dimension selection and ReLU activations in the encoder
+- reconstruction loss and reconstruction-quality evaluation
+
+### `0308_anomaly_gaussian.ipynb`
+
+- multivariate Gaussian anomaly detection
+- Mahalanobis distance for measuring multivariate deviation
+- selecting an anomaly threshold from the estimated distribution
+
 ### `0310_colab filtering and k means demo.ipynb`
 
 - K-means from scratch with initialization, assignment, and centroid update steps
@@ -194,6 +221,13 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - transfer learning as a way to reduce compute and data demands
 - timing forward, backward, and optimizer steps during training
 
+### `0800_char_rnn.ipynb`
+
+- character-level language modeling with a small training corpus
+- vocabulary construction, sequence windows, and next-character targets
+- a manual recurrent neural network and a PyTorch LSTM implementation
+- text generation from predicted character distributions
+
 ### `0900_Refactoring_training_callbacks.ipynb`
 
 - refactoring the training loop into reusable abstractions
@@ -207,10 +241,20 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - separating orchestration concerns from model definition
 - training lifecycle flow from begin, to per-epoch hooks, to end
 
+### `0901_tensorboard.ipynb`
+
+- writing training metrics for TensorBoard visualization
+- inspecting loss and experiment runs with TensorBoard
+
+### `0999_MMR.ipynb`
+
+- Max Marginal Relevance (MMR) for balancing relevance and diversity
+- vectorized selection and fetch-then-rerank retrieval approaches
+
 ## Additional modules
 
 - `0700_image_classifier/img_cls.ipynb`: image classifier workflow notebook
-- `0700_image_classifier/PeepInsideCNN.ipynb`: CNN internals and feature-map inspection
+- `0700_image_classifier/PeepInsideCNN.ipynb`: CNN internals and convolutional feature-map inspection
 - `full_wf/irisnet.py`: end-to-end Iris model script
 - `full_wf/irisnet_dataloader.py`: Iris dataloader-based training workflow
 - `full_wf/titanicnet.py`: Titanic model workflow script
@@ -221,6 +265,7 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - `data/FashionMNIST/raw/*`: local Fashion-MNIST files
 - `titanic.csv`: Titanic sample data
 - `image_50000.csv`: image-related sample data used in demos
+- `0309_colab-filtering.xlsx`: collaborative-filtering optimization exercise using Excel Solver
 - `freesound_community-g-open-thumb-mid-soft-26660.wav`: sample audio file used in spectrogram/audio experiments
 - `tree.dot`: exported decision-tree graph
 
@@ -252,7 +297,7 @@ Target Python in this project: `>=3.14`.
 
 ## Notes and docs
 
-- `notes_docs/Machine Learning Deep Learning.md`: ML/DL terms, definitions, and concept notes
+- `notes_docs/Machine Learning Deep Learning.md`: ML/DL terms, definitions, concept notes, and default loss values
 - `notes_docs/Post CNN Notes.ipynb`: post-CNN notebook notes
 - `notes_docs/Deep Learning Notes-[Tess Ferrandez].pdf`: reference PDF notes
 
@@ -295,13 +340,23 @@ Target Python in this project: `>=3.14`.
 
 16. Session 16 - Convolution, feature extraction from image using convolution, 2D convolution, CNN benefits, padding, stride, maxpool, multiple filters.
 
+17. Session 17 - CNN as combination of feature extractor and classifier/regressor FC network, small CNN used on FashionMnist. Data engineering and EDA, baseline naive Bayesian prior models and single number metrics, default loss values for different use cases as sanity checks, robust data split strategies as the starting points reiterated.
+
+18. Session 18 - End to End CNN flow with emphasis on data engineering principles, train test split for temporally arranged data, data leakage.
+
+
 ### A few Recommended papers and references that came up during the course of the sessions
-https://arxiv.org/pdf/1802.01528v3.pdf - The Matrix Calculus You Need For Deep Learning
-https://arxiv.org/pdf/1604.06737.pdf - Entity Embeddings of Categorical Variables
-https://arxiv.org/pdf/1706.03762.pdf - Attention Is All You Need
-https://arxiv.org/pdf/1512.03385v1.pdf - Deep Residual Learning for Image Recognition
-https://arxiv.org/pdf/1502.03167.pdf - Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift
-https://arxiv.org/pdf/2003.05991.pdf - Autoencoders
-https://arxiv.org/pdf/1805.11604 - How Does Batch Normalization Help Optimization?
-https://arxiv.org/pdf/1708.07120 - Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates
-https://arxiv.org/pdf/1812.01187.pdf - Bag of Tricks for Image Classification with Convolutional Neural Networks
+
+| Link | Title |
+| --- | --- |
+| [arXiv:1802.01528](https://arxiv.org/pdf/1802.01528v3.pdf) | The Matrix Calculus You Need For Deep Learning |
+| [arXiv:1604.06737](https://arxiv.org/pdf/1604.06737.pdf) | Entity Embeddings of Categorical Variables |
+| [arXiv:1706.03762](https://arxiv.org/pdf/1706.03762.pdf) | Attention Is All You Need |
+| [arXiv:1512.03385](https://arxiv.org/pdf/1512.03385v1.pdf) | Deep Residual Learning for Image Recognition |
+| [arXiv:1502.03167](https://arxiv.org/pdf/1502.03167.pdf) | Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift |
+| [arXiv:2003.05991](https://arxiv.org/pdf/2003.05991.pdf) | Autoencoders |
+| [arXiv:1805.11604](https://arxiv.org/pdf/1805.11604) | How Does Batch Normalization Help Optimization? |
+| [arXiv:1708.07120](https://arxiv.org/pdf/1708.07120) | Super-Convergence: Very Fast Training of Neural Networks Using Large Learning Rates |
+| [arXiv:1812.01187](https://arxiv.org/pdf/1812.01187.pdf) | Bag of Tricks for Image Classification with Convolutional Neural Networks |
+| [arXiv:1710.09412](https://arxiv.org/pdf/1710.09412.pdf) | mixup: Beyond Empirical Risk Minimization |
+| [arXiv:1911.02685](https://arxiv.org/pdf/1911.02685.pdf) | comprehensive survey on Transfer Learning |
