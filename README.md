@@ -344,6 +344,10 @@ Target Python in this project: `>=3.14`.
 
 18. Session 18 - End to End CNN flow with emphasis on data engineering principles, train test split for temporally arranged data, data leakage.
 
+19. Session 19 - skip/residual connections, exploding and vanishing gradients, resnet, inception net, 1x1 conv as computational shortcuts for channel up/downsampling
+
+20. Session 20 - transfer learning and fine tuning, weight init basics, misc topics.
+
 
 ### A few Recommended papers and references that came up during the course of the sessions
 
