@@ -48,6 +48,7 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 -  Data leakage, example of audio classification and spectrograms project, where test set included random spectrograms from the raw set, which implied (since there was an overlap by design) that it was being evaluated on data already seen by the model during training. This led to 98%+ accuracy on the test set, which was misleading and not representative of real-world performance.
 
 ### `0000_grad_des.ipynb`
+- gradient descent for analytically closed form functions.
 - defining and evaluating loss functions for optimization
 - computing partial derivatives with respect to multiple parameters
 - learning-rate choice and its effect on update size
@@ -57,7 +58,7 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - tracking loss over iterations and plotting convergence on a log scale
 
 ### `0100_man_grad_des.ipynb`
-
+- manual gradient descent implementation for linear regression, based on data.
 - mean squared error for linear regression
 - manual derivation of gradients for slope and intercept
 - why gradients should be computed before both parameters are updated
