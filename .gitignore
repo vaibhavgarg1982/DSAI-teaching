@@ -15,3 +15,9 @@ experiment_track.pth
 0700_image_classifier/*.pth
 runs/*
 image_shoe.xlsx
+# */*/chats/*
+# # notes_docs/wiki/chats/*
+# notes_docs/wiki/mdwiki.html
+# notes_docs/wiki/MDwiki.js
+# notes_docs/wiki/MDwiki.min.js
+notes_docs/wiki
