@@ -37,15 +37,15 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - `audio-spectrogram.ipynb`: spectrogram experiments for audio-as-image intuition
 - `PINN_basic_demo.ipynb`: introductory PINN (Physics-Informed Neural Network) demo
 
-## Topics covered in the 0xxx notebooks
+## Notebook topics
 
-### Engineering aspects of DL and ML
--  Overfitting and underfitting
--  Train/test splitting and stratification
--  Tracking loss and accuracy over epochs
--  Training, validation and test set discipline
--  Why loss functions and metric that matters might be different.
--  Data leakage, example of audio classification and spectrograms project, where test set included random spectrograms from the raw set, which implied (since there was an overlap by design) that it was being evaluated on data already seen by the model during training. This led to 98%+ accuracy on the test set, which was misleading and not representative of real-world performance.
+### Engineering aspects of ML and DL
+- overfitting and underfitting
+- train/test splitting and stratification
+- training, validation, and test-set discipline
+- tracking loss and metrics across epochs
+- choosing metrics that match the task rather than relying on accuracy alone
+- data leakage, including an audio-classification example where overlapping source data produced misleadingly high test accuracy
 
 ### `0000_grad_des.ipynb`
 - gradient descent for analytically closed form functions.
@@ -67,6 +67,12 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - applying parameter updates inside `torch.no_grad()`
 - zeroing gradients between iterations with `.grad.zero_()`
 - detaching tensors before plotting or analysis
+
+### `0120_common_activations_non_linearities.ipynb`
+
+- sigmoid, tanh, ReLU, leaky ReLU, ELU, and Softmax
+- how nonlinear activations affect model expressiveness and outputs
+- choosing output activations for regression and classification
 
 ### `0125_class_objects.ipynb`
 
@@ -112,10 +118,16 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 - binary classification with a neural network
 - using `BCEWithLogitsLoss` for numerical stability
 - thresholding sigmoid outputs for class predictions
-- weight decay as L2 regularization - mention Dropout etc. Also mention early stopping and learning rate scheduling
+- weight decay as L2 regularization, with dropout, early stopping, and learning-rate scheduling as related techniques
 - train versus validation loss tracking to spot overfitting
 - confusion-matrix heatmaps for error analysis
 - switching between `model.train()` and `model.eval()` correctly
+
+### `0200_titanic-overunder.ipynb`
+
+- comparing training and validation behavior as model capacity changes
+- diagnosing overfitting and underfitting in a tabular neural network
+- using learning curves to guide model and regularization choices
 
 ### `0250_titanic_age_demo.ipynb`
 
@@ -251,6 +263,18 @@ Hands-on notebooks and scripts for teaching core machine learning and neural net
 
 - Max Marginal Relevance (MMR) for balancing relevance and diversity
 - vectorized selection and fetch-then-rerank retrieval approaches
+
+### `audio-spectrogram.ipynb`
+
+- converting audio signals into spectrogram representations
+- using Fourier analysis to inspect frequency content
+- considering data-split leakage when spectrograms come from related source recordings
+
+### `PINN_basic_demo.ipynb`
+
+- introducing Physics-Informed Neural Networks (PINNs)
+- using PyTorch autograd to construct derivatives in a training objective
+- combining data-driven and physics-based constraints
 
 ## Additional modules
 
