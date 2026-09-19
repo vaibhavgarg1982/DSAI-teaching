@@ -149,7 +149,20 @@ $$
 * **EWMA** - Exponentially weighted moving average. $\beta w_i + (1-\beta)w_{i-1}$
 * **Bias Correction** - Remove early-step EWMA bias. $\hat{w}_i = \frac{w_i}{1-\beta^i}$
 
----
+
+
+### Default values of losses of "ignorant" predictions
+
+| Task / loss                 | "Ignorant" prediction                        |                   Expected baseline |
+| --------------------------- | -------------------------------------------- | ----------------------------------: |
+| Binary BCE                  | (p=0.5)                                      |                        $\ln2=0.693$ |
+| (K)-class CE                | uniform (p=1/K)                              |                             $\ln K$ |
+| Binary BCE, class prior (p) | constant (p)                                 |                              $H(p)$ |
+| MSE                         | predict 0, standardized target               |                                 $1$ |
+| MSE                         | predict target mean                          |             $\operatorname{Var}(y)$ |
+| MAE                         | predict target median                        | mean absolute deviation from median |
+| Gaussian NLL                | depends on assumed variance/parameterization |                  no universal value |
+
 
 # Learning Rate Scheduling
 
@@ -370,14 +383,6 @@ $$
 
 ---
 
-# Practical Assets in This Workspace
-
-* **FashionMNIST Raw Files** - Image classification dataset for FC/CNN notebooks.
-* **titanic.csv** - Structured tabular dataset for classification/regression demos.
-* **image_50000.csv** - Image-like tabular representation for ML experiments.
-* **Sample WAV File** - Audio source for spectrogram notebook.
-
----
 
 # The Big Picture
 
@@ -388,14 +393,3 @@ $$
 * **Everything is Optimization** - Update parameters to reduce loss.
 
 
-
-
-| Task / loss                 | "Ignorant" prediction                        |                   Expected baseline |
-| --------------------------- | -------------------------------------------- | ----------------------------------: |
-| Binary BCE                  | (p=0.5)                                      |                        (\ln2=0.693) |
-| (K)-class CE                | uniform (p=1/K)                              |                             (\ln K) |
-| Binary BCE, class prior (p) | constant (p)                                 |                              (H(p)) |
-| MSE                         | predict 0, standardized target               |                                 (1) |
-| MSE                         | predict target mean                          |             (\operatorname{Var}(y)) |
-| MAE                         | predict target median                        | mean absolute deviation from median |
-| Gaussian NLL                | depends on assumed variance/parameterization |                  no universal value |
