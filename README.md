@@ -347,7 +347,7 @@ Target Python in this project: `>=3.14`.
 
 7. Session 7 - Neuron , Universal Approximation theorem, Brief of Historical milestones in field of NN, XOR problem, Selection of non linearity, Sigmoid function.
 
-8. Session 8 - Common Non Linear Activations( Sigmoid, tanh, ReLU, leakage ReLU, ELU, Soft Max), IRIS data set, Multi Layer NN, basic FC/dense, Multi class classification, nll and cross entropy loss.
+8. Session 8 - Common Non Linear Activations( Sigmoid, tanh, ReLU, leaky ReLU, ELU, Soft Max), IRIS data set, Multi Layer NN, basic FC/dense, Multi class classification, nll and cross entropy loss.
 
 9. Session 9 - Numerical Data, Catagorical ( Ordinal and Non-Ordinal) Data, One-Hot encoding, Drop First, Train set, validation/dev set, Test set, Overfitting,  Under-fitting, Fan-In, Fan-Out.
 
