@@ -333,45 +333,45 @@ Target Python in this project: `>=3.14`.
 ![CNN](<notes_docs/CNN 1 page v2.png>)
 
 ## Progression
-1. Session 1 - Machine learning classification, classification based on learning methods, Slope(gradient)
+1. **Session 1 - Foundations:** Introduction, intelligence, learning, and the hierarchy of machine learning.
 
-2. Session 2 - Matrix multiplication as affine functions, chain rule, functions, composition, composition of affine functions. Scalar, vector, tensor. 
+2. **Session 2 - Functions and calculus:** Relations and functions, composition, linear and affine functions, composition of affine functions, differentiation, the chain rule, matrices, and tensors.
 
-3. Session 3 - gradient descent, hadamard product, L2 norm and frobenious norm.
+3. **Session 3 - Linear algebra and optimization:** Matrix multiplication, the Hadamard product, matrix norms including the Frobenius norm, maxima and minima, and gradient descent.
 
-4. Session 4 - Machine Learning  libraries ,bias, MSE , MAE. 
+4. **Session 4 - Gradient descent in practice:** Demo code, hyperparameters, learning rate, PyTorch and related libraries, `autograd`, and a `micrograd` code review.
 
-5. Session 5 - functions, optimization, loss functions, gradient descent, manual demo with linear data, inference and training, generalisability of loss functions. OOPs basics.
+5. **Session 5 - Loss and optimization:** Reparameterization, loss functions and criteria, `forward()`, MSE, loss-function properties, and optimization examples.
 
-6. Session 6 - Extend with pytorch concepts, Autograd, optim.SGD, MSE loss etc.
+6. **Session 6 - PyTorch optimization:** Optimizers, stochastic gradient descent (SGD), `MSELoss`, and PyTorch's gradient accumulation behavior, including the need for `zero_grad()`.
 
-7. Session 7 - Neuron , Universal Approximation theorem, Brief of Historical milestones in field of NN, XOR problem, Selection of non linearity, Sigmoid function.
+7. **Session 7 - Python and gradient-descent review:** Gradient descent review, object-oriented programming, dunder methods, and inheritance.
 
-8. Session 8 - Common Non Linear Activations( Sigmoid, tanh, ReLU, leaky ReLU, ELU, Soft Max), IRIS data set, Multi Layer NN, basic FC/dense, Multi class classification, nll and cross entropy loss.
+8. **Session 8 - Neural-network foundations:** Neural-network history, the perceptron, the XOR problem, fully connected multilayer perceptrons, layers, and matrix multiplication as an affine function for any number of inputs.
 
-9. Session 9 - Numerical Data, Catagorical ( Ordinal and Non-Ordinal) Data, One-Hot encoding, Drop First, Train set, validation/dev set, Test set, Overfitting,  Under-fitting, Fan-In, Fan-Out.
+9. **Session 9 - MLP architecture:** Multiple input sets, MLP/DNN/FCN structure, layers as compositions of affine functions, nonlinearities, activation-function properties and types, and the universal approximation theorem.
 
-10. Session 10 - Titanic data set, handling of missing data, stratify and deterministic randomisation in train-test split, F1 Score, Precision and recall.
+10. **Session 10 - Prediction tasks:** Regression, MSE, MAE, binary classification, binary cross-entropy with logits, multiclass classification, categorical cross-entropy with logits, negative log likelihood, the Iris dataset, data types, epochs, training, and inference.
 
-11. Session 11 - end to end MLP design, overfit and underfit, Regularisation, L2 reg and weight decay.
+11. **Session 11 - Generalization and regularization:** Train/dev/test and holdout sets, loss curves, overfitting and underfitting, imputation, stratification, data leakage, regularization, L2 regularization, and weight decay.
 
-12. Session 12 - Unsupervised learning use cases, Dimensionality reduction, wine dataset, SVD and PCA, Auto encoder, Auto encoder as anomaly detection.
+12. **Session 12 - Evaluation and tabular data:** Contingency tables, precision/specificity, recall/sensitivity, F1 score, minority-class interpretation, the Titanic dataset, one-hot encoding with `get_dummies()`, and `drop_first`.
 
-13. Session 13 - Clustering (K- means) , anomaly detection, Multivariate Gaussian, Recommendation engine, collaborative filtering.
+13. **Session 13 - Unsupervised learning:** Use cases for unsupervised learning, dimensionality reduction, the wine dataset, SVD, PCA, autoencoders, and autoencoders for anomaly detection.
 
-14. Session 14 - Collaborative Filtering, Dataset and dataloaders introduction.
+14. **Session 14 - Clustering and recommendation:** K-means, anomaly detection with a multivariate Gaussian, recommendation engines, and collaborative filtering.
 
-15. Session 15 - Exponentially Weighted Moving average(EWMA), momentum, RMSProp, Adam, Adam with decoupled weights (AdamW), Image representation,  training a FC model with Fashion-MNIST image data set after flatten, concepts of spatial invariance violation in FC for images
+15. **Session 15 - Data pipelines and adaptive optimization:** Collaborative filtering, datasets and dataloaders, EWMA, momentum, RMSProp, Adam, and AdamW.
 
-16. Session 16 - Convolution, feature extraction from image using convolution, 2D convolution, CNN benefits, padding, stride, maxpool, multiple filters.
+16. **Session 16 - Image representations and fully connected models:** Fashion-MNIST, flattening images for a fully connected model, and the spatial-invariance limitations of fully connected networks.
 
-17. Session 17 - CNN as combination of feature extractor and classifier/regressor FC network, small CNN used on FashionMnist. Data engineering and EDA, baseline naive Bayesian prior models and single number metrics, default loss values for different use cases as sanity checks, robust data split strategies as the starting points reiterated.
+17. **Session 17 - Convolutional neural networks:** Convolution, image feature extraction, 2D convolution, CNN benefits, padding, stride, max pooling, and multiple filters.
 
-18. Session 18 - End to End CNN flow with emphasis on data engineering principles, train test split for temporally arranged data, data leakage.
+18. **Session 18 - End-to-end CNN workflows:** CNNs as feature extractors plus classifier or regressor networks, a small Fashion-MNIST CNN, data engineering and EDA, baseline models, single-number metrics, default loss values as sanity checks, and robust data-split strategies.
 
-19. Session 19 - skip/residual connections, exploding and vanishing gradients, resnet, inception net, 1x1 conv as computational shortcuts for channel up/downsampling
+19. **Session 19 - Reliable CNN experimentation:** End-to-end CNN flow, data-engineering principles, temporally ordered train/test splits, and data leakage.
 
-20. Session 20 - transfer learning and fine tuning, weight init basics, misc topics.
+20. **Session 20 - Advanced architectures and transfer learning:** Skip/residual connections, exploding and vanishing gradients, ResNet, Inception, 1x1 convolutions for channel scaling, transfer learning, fine-tuning, and weight-initialization basics.
 
 
 ### A few Recommended papers and references that came up during the course of the sessions
