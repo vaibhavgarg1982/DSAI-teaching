@@ -867,7 +867,7 @@ Accuracy changes discretely when predictions cross a decision boundary and is no
 |---|---|---|
 | MSE | \(\frac1N\sum_i(y_i-\hat y_i)^2\) | Strongly penalizes large residuals; smooth derivative; sensitive to outliers. |
 | MAE | \(\frac1N\sum_i|y_i-\hat y_i|\) | More robust to large residuals; absolute value has a kink at zero. |
-| Huber | \(\frac12e^2\) for \(|e|\le\delta\); \(\delta(|e|-\frac12\delta)\) otherwise | Quadratic near zero, linear for large errors; balances smoothness and robustness. |
+| Huber | \(\frac{1}{2}e^2\) for \(\|e\|\le\delta\); \(\delta(\|e\|-\frac{1}{2}\delta)\) otherwise | Quadratic near zero, linear for large errors; balances smoothness and robustness. |
 | BCE | \(-[y\log p+(1-y)\log(1-p)]\) | Binary classification when a probability is supplied; `BCEWithLogitsLoss` is usually the numerically stable PyTorch choice. |
 | Multiclass cross-entropy | \(-\log p_y\) | Penalizes low probability assigned to the true class. |
 | Hinge | Margin-based penalty, e.g. \(\max(0,1-yf(x))\) for labels \(y\in\{-1,+1\}\) | Classic maximum-margin classification objective. |
@@ -1563,3 +1563,1061 @@ These should be treated as continuation checkpoints, not silently declared compl
 9. **Titanic notebook versioning:** reported scores span different iterations; inspect the current code before citing a “best” result.
 10. **CNN input sizes and transfer learning:** resizing to a pretrained network's preferred dimensions has a computational cost and does not increase source information.
 
+## R. Source-of-truth policy for future continuation
+
+Use this hierarchy:
+1. Current notebook/code and its outputs for implementation state.
+2. The original `teaching MLAI.md` export for what was actually discussed and which values appeared in a particular run.
+3. This knowledge base for navigation, continuity, and consolidated equations.
+4. General ML knowledge only to explain or verify a point, clearly distinguishing it from a decision or result documented in the source.
+
+Do not merge numbers from different runs, treat suggestions as decisions, or infer that a proposed curriculum module has been completed. The knowledge base is intentionally more detailed than the original overview, but it remains a synthesis rather than a replacement for executable notebooks and raw conversation history.
+
+# Technical Appendix II — Expanded Working Reference
+
+This second appendix goes deeper than the first. It is designed for an AI or human continuing the actual technical work: reconstructing derivations, understanding why the code is shaped as it is, interpreting experimental evidence, and knowing what to inspect before changing an implementation.
+
+**Evidence labels used here**
+- **Recorded:** directly reflected in the project export, notebook excerpts, or documented experimental discussion.
+- **Derived:** a mathematical consequence of the recorded setup.
+- **General reference:** additional standard ML/PyTorch context included to make the notes usable. It should not be mistaken for a decision made in the project.
+
+The conversation export includes more than one notebook iteration and some broader course-planning discussion. Reported numbers below are always tied to their described context where possible; they are not a single benchmark suite.
+
+## T. The common mathematical skeleton of supervised learning
+
+### T.1 Parameterized function
+
+A supervised model can be represented as
+
+\[
+\hat y=f(x;\theta),
+\]
+
+where:
+- \(x\) is an input example or feature vector;
+- \(y\) is the observed target;
+- \(\hat y\) is the model's prediction;
+- \(\theta\) denotes all trainable parameters;
+- \(f\) is the model architecture plus its forward computation.
+
+For a dataset \(\mathcal D=\{(x_i,y_i)\}_{i=1}^N\), empirical risk minimization chooses parameters to minimize an average loss:
+
+\[
+J(\theta)=\frac{1}{N}\sum_{i=1}^{N}\ell(f(x_i;\theta),y_i).
+\]
+
+The familiar training loop is an implementation of this objective:
+
+1. Compute \(f(x_i;\theta)\) — forward pass.
+2. Compare predictions with targets using \(\ell\) — loss.
+3. Differentiate the loss with respect to \(\theta\).
+4. Update \(\theta\) with an optimization algorithm.
+5. Repeat, then measure performance on data not used to fit \(\theta\).
+
+This skeleton is shared by linear regression, logistic regression, multilayer perceptrons, CNNs, and transformers. The architecture changes the function family; the loss changes what counts as a good prediction; the optimizer changes how parameters are updated.
+
+### T.2 Error, loss, cost, objective, and criterion
+
+These terms are often used inconsistently, so record the convention in the notebook rather than assuming universal terminology.
+
+- **Residual/error:** a per-example discrepancy such as \(e_i=y_i-\hat y_i\). In classification, “error” may mean an incorrect predicted class rather than a signed numerical residual.
+- **Loss:** a scalar penalty for a prediction, often per example before reduction.
+- **Cost:** often the aggregate loss over a dataset or batch.
+- **Objective:** the complete quantity optimized; it may include data loss plus regularization or other terms.
+- **Criterion:** common PyTorch code name for the loss module, e.g. `criterion = nn.MSELoss()`.
+
+A regularized objective might be
+
+\[
+J(\theta)=\frac1N\sum_i\ell(f(x_i;\theta),y_i)+\lambda R(\theta).
+\]
+
+The regularizer \(R(\theta)\) is part of the objective even though it does not directly measure prediction error on an example.
+
+### T.3 Empirical risk is not population risk
+
+The training objective is calculated from a finite sample. The quantity of real interest is performance on the data-generating distribution, which is unknown. A model can minimize empirical loss while generalizing poorly if it exploits sample-specific patterns. This is why training loss alone cannot establish model quality, and why a held-out split must be independent of model selection to provide a credible final estimate.
+
+## U. Deriving linear regression and its optimization landscape
+
+### U.1 Vectorized linear regression
+
+For \(N\) observations and \(d\) features, augment the feature matrix with a column of ones to absorb the intercept:
+
+\[
+\tilde X=
+\begin{bmatrix}
+x_1^\top & 1\\
+\vdots & \vdots\\
+x_N^\top & 1
+\end{bmatrix},\qquad
+\theta=
+\begin{bmatrix}
+w\\b
+\end{bmatrix}.
+\]
+
+Then predictions are
+
+\[
+\hat y=\tilde X\theta.
+\]
+
+With residual vector \(r=\tilde X\theta-y\), the half-scaled least-squares objective is
+
+\[
+J(\theta)=\frac{1}{2N}\|\tilde X\theta-y\|_2^2.
+\]
+
+Its gradient is
+
+\[
+\nabla_\theta J=\frac1N\tilde X^\top(\tilde X\theta-y).
+\]
+
+The Hessian is
+
+\[
+\nabla^2_\theta J=\frac1N\tilde X^\top\tilde X.
+\]
+
+Since \(\tilde X^\top\tilde X\) is positive semidefinite, this objective is convex. If the design matrix has full column rank, the Hessian is positive definite and the minimizer is unique. If columns are linearly dependent, there may be multiple parameter vectors with identical predictions and loss.
+
+The closed-form normal-equation solution, when the inverse exists, is
+
+\[
+\theta^*=(\tilde X^\top\tilde X)^{-1}\tilde X^\top y.
+\]
+
+In practice, one generally solves least squares using stable linear algebra rather than explicitly computing a matrix inverse. The normal equation is valuable conceptually; gradient descent is valuable for understanding iterative optimization and for models where a closed-form solution is unavailable or impractical.
+
+### U.2 Why the two-parameter loss surface is bowl-shaped
+
+For \(\hat y_i=mx_i+c\), MSE is
+
+\[
+L(m,c)=\frac1N\sum_i(y_i-mx_i-c)^2.
+\]
+
+It is a quadratic function of \(m,c\). Its level sets are ellipses (or degenerate ellipses) in parameter space, and the shape depends on the distribution of \(x\), its scale, and the coupling between slope and intercept. If \(x\) is not centered, changing \(m\) can be compensated partly by changing \(c\), tilting the contours. Centering \(x\) reduces this coupling.
+
+This explains several visualization observations in the project:
+- the trajectory descends toward the bottom of a bowl;
+- contours need not be circles;
+- the optimum can be tilted relative to the coordinate axes;
+- the parameter path depends on the starting point and learning rate even though the convex objective has no spurious local minima.
+
+### U.3 Gradient descent stability
+
+For a quadratic objective with Hessian eigenvalues \(\lambda_i\), plain gradient descent behaves independently along each eigendirection. In the simplest positive-definite case, a learning rate satisfying
+
+\[
+0<\eta<\frac{2}{\lambda_{\max}}
+\]
+
+is required for convergence of the fixed-step linear iteration. If \(\eta\) is too large, the path can oscillate or diverge; if it is very small, convergence is slow. The condition number \(\kappa=\lambda_{\max}/\lambda_{\min}\) describes how stretched the bowl is and helps explain slow progress in narrow valleys.
+
+This is why plotting only the loss value is not always enough. The parameter trajectory can reveal oscillation and poor conditioning that a loss curve hides.
+
+### U.4 The project’s two different landscapes
+
+**Recorded distinction:** the project had both:
+1. an MSE surface computed from \(X\), \(y\), and \(\hat y=mx+c\); and
+2. a synthetic non-convex scalar function, such as
+   \[
+   L(m,c)=m^2+c^2+2\sin(3m)\sin(3c).
+   \]
+
+The first illustrates the actual regression objective and is convex. The second is an artificial optimization landscape, not a regression model. It can have multiple local structures and is useful for demonstrating that gradient descent follows local derivatives rather than globally inspecting the entire surface.
+
+For a trajectory visualization, store the parameters after each update. Be explicit about whether the initial point is included and whether the stored loss corresponds to parameters before or after the update; otherwise the plotted path and loss series may be offset by one step.
+
+### U.5 Numerical gradient checking
+
+A central finite-difference approximation for a scalar objective \(J(\theta)\) is
+
+\[
+\frac{\partial J}{\partial\theta_j}
+\approx
+\frac{J(\theta+\epsilon e_j)-J(\theta-\epsilon e_j)}{2\epsilon}.
+\]
+
+This is a useful check against autograd for a tiny model. Choose \(\epsilon\) neither so large that curvature dominates nor so small that floating-point rounding dominates. Compare relative error as well as absolute error, and use double precision for serious gradient checks. Finite differences become expensive in high-dimensional models because each parameter requires extra objective evaluations.
+
+## V. The chain rule, computational graphs, and backpropagation
+
+### V.1 Scalar chain rule
+
+For \(u=g(x)\) and \(y=f(u)\),
+
+\[
+\frac{dy}{dx}=\frac{dy}{du}\frac{du}{dx}.
+\]
+
+For a neural network with successive layers,
+
+\[
+h_1=f_1(x),\quad h_2=f_2(h_1),\quad
+\hat y=f_3(h_2),
+\]
+
+the derivative is a chain of local derivatives. Backpropagation computes these efficiently by reusing intermediate derivatives rather than differentiating every parameter independently from scratch.
+
+### V.2 A one-hidden-layer example
+
+Let
+
+\[
+z_1=W_1x+b_1,\qquad
+h=\phi(z_1),\qquad
+z_2=W_2h+b_2,\qquad
+L=\ell(z_2,y).
+\]
+
+Backpropagation proceeds from the loss toward the input:
+
+\[
+\delta_2=\frac{\partial L}{\partial z_2},
+\]
+\[
+\frac{\partial L}{\partial W_2}=\delta_2h^\top,\qquad
+\frac{\partial L}{\partial b_2}=\delta_2,
+\]
+\[
+\delta_1=(W_2^\top\delta_2)\odot\phi'(z_1),
+\]
+\[
+\frac{\partial L}{\partial W_1}=\delta_1x^\top,\qquad
+\frac{\partial L}{\partial b_1}=\delta_1.
+\]
+
+The Hadamard product \(\odot\) is element-wise multiplication. Matrix dimensions determine whether the products are valid; they are not decoration. With a batch, gradients sum or average over examples according to the loss reduction and implementation.
+
+### V.3 Why autograd and backpropagation are related but not identical terms
+
+- **Backpropagation** is the reverse-mode chain-rule algorithm used to compute derivatives efficiently for a scalar loss with respect to many parameters.
+- **Automatic differentiation (autograd)** is the broader machinery that records or reconstructs computational dependencies and calculates derivatives.
+- **Computational graph** describes the operations and dependencies used to calculate a result.
+- PyTorch autograd usually builds a dynamic graph during the forward pass; `.backward()` traverses it in reverse to compute gradients.
+
+Autograd is not symbolic algebra and does not generally simplify an expression into a human-readable closed form. It differentiates the operations actually executed. A wrong forward pass can produce perfectly consistent but wrong gradients.
+
+### V.4 Leaf tensors, graph lifetime, and gradient accumulation
+
+A tensor created directly with `requires_grad=True` is typically a leaf tensor. Its gradient is populated in `.grad` after backward. Intermediate non-leaf tensors do not retain `.grad` by default unless `retain_grad()` is called.
+
+Important behaviours:
+- Gradients accumulate into existing `.grad` buffers.
+- `optimizer.zero_grad()` clears parameter gradients; some versions/options set gradients to `None` rather than filling with zeros.
+- The same graph generally cannot be backpropagated through repeatedly after its saved intermediates are freed unless `retain_graph=True` is used. Retaining graphs unnecessarily consumes memory.
+- In-place operations on tensors needed for gradient calculation can trigger autograd errors or invalidate assumptions.
+- Use `torch.no_grad()` for parameter updates and evaluation computations that should not enter the graph.
+- Avoid converting differentiable values to NumPy or Python numbers in the middle of a computation if gradients are still required.
+
+## W. Tensor layout, shape, `view`, `reshape`, and `permute`
+
+This section records a recurring source of confusion in the project.
+
+### W.1 Shape is not layout
+
+A tensor has a logical shape and a memory-stride description. Shape says how many elements each dimension represents. Strides describe how far memory moves when an index changes. Two tensors can have the same logical values and shape but different storage/layout characteristics.
+
+### W.2 `view`
+
+`x.view(new_shape)` creates a view of the same underlying storage, reinterpreting the elements under a new shape. It generally requires a stride-compatible layout; a non-contiguous tensor may not support the requested view.
+
+Example:
+
+```python
+x = torch.arange(24).reshape(2, 3, 4)
+y = x.view(2, 12)
+```
+
+This groups the same logical sequence of elements into a different shape. It does not transpose axes.
+
+### W.3 `permute`
+
+`x.permute(dims)` reorders the dimensions:
+
+```python
+# NCHW -> NHWC
+x_nhwc = x_nchw.permute(0, 2, 3, 1)
+```
+
+For an image batch:
+- NCHW means `(batch, channels, height, width)`;
+- NHWC means `(batch, height, width, channels)`.
+
+`permute` usually returns a view with changed strides, not a copy of reordered data. A subsequent `.view(...)` may fail if the strides are incompatible. `.contiguous()` can create a contiguous copy when required.
+
+### W.4 `reshape`
+
+`reshape` returns a view when possible and may allocate a copy otherwise. It is often more robust than `view` when the exact contiguity is uncertain, but the possibility of a copy matters for memory and performance. It does not substitute for `permute`: reshaping does not express a semantic reordering of axes.
+
+### W.5 Practical diagnostic sequence
+
+When a shape operation fails:
+1. Print `x.shape`, `x.stride()`, and `x.is_contiguous()`.
+2. Decide whether the goal is to merge/split dimensions (`view`/`reshape`) or reorder axes (`permute`/`transpose`).
+3. If a contiguous layout is required, use `.contiguous()` deliberately and understand that it may copy.
+4. Verify the semantic meaning of each axis, not only the final shape. A tensor can have the expected dimensions while the channels and spatial axes are incorrectly ordered.
+
+## X. Batches, epochs, iterations, and loss reduction
+
+### X.1 Vocabulary
+
+- **Example/sample:** one input-target pair.
+- **Batch:** examples processed together in one forward/backward pass.
+- **Mini-batch:** a batch smaller than the full training set.
+- **Iteration/step:** usually one optimizer update.
+- **Epoch:** one pass through the entire training set.
+- **Shuffle:** randomize example order before forming batches.
+
+If the training set has \(N\) examples and batch size \(B\), one epoch contains approximately \(\lceil N/B\rceil\) updates when the final incomplete batch is retained. A “10,000 epochs” loop over a full tensor is 10,000 full-batch updates; a DataLoader loop may perform many updates per epoch.
+
+### X.2 `reduction="mean"` versus `"sum"`
+
+For a batch of \(B\) examples:
+- `mean` typically averages element-wise loss values over the relevant output elements;
+- `sum` adds them.
+
+With `sum`, gradient magnitude usually grows with batch size. With `mean`, it is normalized by the number of elements used in the reduction. The exact denominator matters for losses with multiple output dimensions and masks. When comparing code or deriving gradients, state the reduction convention.
+
+### X.3 Full-batch versus mini-batch optimization
+
+Full-batch gradient descent uses the gradient of the complete training-set objective per update. Mini-batch gradients are estimates of that gradient and vary with batch sampling. Mini-batches reduce per-step compute and can provide useful stochasticity, but they also introduce variance in the optimization trajectory. A change from full-batch to mini-batch training is not merely a speed optimization: it changes the number and noise characteristics of updates per epoch.
+
+## Y. Initialization, activations, and gradient propagation
+
+### Y.1 Why hidden layers need nonlinearities
+
+Composing affine maps alone does not create a more expressive family:
+
+\[
+W_2(W_1x+b_1)+b_2=(W_2W_1)x+(W_2b_1+b_2).
+\]
+
+The composition is still affine. A nonlinear activation between layers prevents this collapse and permits nonlinear decision boundaries.
+
+### Y.2 Sigmoid saturation
+
+For sigmoid,
+
+\[
+\sigma'(z)=\sigma(z)(1-\sigma(z)).
+\]
+
+The derivative is at most \(1/4\) and approaches zero for large positive or negative \(z\). In deep compositions, repeatedly multiplying small derivatives can contribute to vanishing gradients. This is one reason sigmoid is common at a binary output but less common in hidden layers of modern deep feedforward networks.
+
+### Y.3 ReLU and its limitations
+
+\[
+\operatorname{ReLU}(z)=\max(0,z).
+\]
+
+Its derivative is 1 on the positive side and 0 on the negative side (the derivative at exactly zero is conventionally assigned by the implementation). ReLU avoids sigmoid-style saturation on the positive side, but a unit that remains negative for all relevant inputs may receive no gradient through that activation; this is the “dead ReLU” concern. Leaky ReLU leaves a small negative slope.
+
+### Y.4 Initialization scale
+
+If activations grow or shrink systematically through layers, signal variance and gradient magnitudes can become unstable. Xavier/Glorot and He/Kaiming initialization are designed to control variance under different activation assumptions. They are not universal guarantees: residual connections, normalization layers, activation details, fan-in/fan-out, and architecture all matter.
+
+### Y.5 Universal approximation is not a practical guarantee
+
+A universal approximation theorem establishes that certain neural-network families can approximate broad classes of functions under stated conditions. It does not say:
+- that a small network will learn the function from finite data;
+- that gradient descent will find the right parameters;
+- that the required width or data is practical;
+- that approximation on observed data guarantees generalization.
+
+The XOR example is a useful small illustration of representational limits: a single linear decision boundary cannot separate XOR labels in the original two-dimensional input space, while a network with a nonlinear hidden representation can.
+
+## Z. Decision boundaries and logistic regression
+
+### Z.1 Logistic regression is linear in log-odds
+
+For binary logistic regression,
+
+\[
+z=w^\top x+b,\qquad
+p(y=1\mid x)=\sigma(z).
+\]
+
+The log-odds are
+
+\[
+\log\frac{p}{1-p}=w^\top x+b.
+\]
+
+At a threshold \(p=0.5\), the boundary is \(w^\top x+b=0\), a hyperplane in the input feature space. Other probability thresholds shift the boundary to \(w^\top x+b=\log(\tau/(1-\tau))\).
+
+The name “regression” refers to modelling a probability/log-odds function, not to predicting a continuous target. A hidden-layer network can form nonlinear boundaries by transforming the input before the output layer.
+
+### Z.2 Threshold and probability are distinct
+
+The output probability is a model score; the decision threshold converts it to a class. Moving the threshold changes precision and recall without changing the underlying logits. Threshold selection should be done on validation data, based on the costs of false positives and false negatives, and not tuned on the final test set.
+
+## AA. Titanic experiment: more detailed audit record
+
+### AA.1 Feature and preprocessing contract
+
+**Recorded setup:** `sns.load_dataset("titanic")`, with columns:
+
+```text
+survived, pclass, sex, age, sibsp, parch, fare
+```
+
+The target is `survived`; the six input columns after encoding are `pclass`, `age`, `sibsp`, `parch`, `fare`, and one encoded `sex` indicator.
+
+The discussed pipeline:
+1. Select only these columns.
+2. Impute missing `age`.
+3. Encode `sex` with `pd.get_dummies(..., drop_first=True)`.
+4. Split train/test with `test_size=0.2`, `random_state=42`, and stratification on `survived`.
+5. Fit `StandardScaler` on training `age` and `fare`.
+6. Transform both training and test columns using that fitted scaler.
+7. Convert feature and target columns to float32 tensors.
+8. Reshape binary target to `(N,1)`.
+9. Train an MLP and compare train/test performance.
+
+A later review specifically identified that imputation was initially performed before the split in one version. The median computed from all rows is a mild form of test-set leakage. The clean pipeline fits the imputer on training data only and applies that learned median to test data. The same train-only rule applies to scaling.
+
+### AA.2 Exact tensor shapes in the documented split
+
+For 891 rows, an 80/20 split with `test_size=0.2` produces 712 training rows and 179 test rows in the discussed scikit-learn configuration. The recorded training tensors were:
+- `X`: `(712, 6)`
+- `y` before reshape: `(712,)`
+- `y` after `.view(-1, 1)`: `(712, 1)`
+
+A `Linear(6,1)` model returns `(712,1)`, which aligns with `BCEWithLogitsLoss` targets of `(712,1)`.
+
+### AA.3 Preprocessing subtleties
+
+- **Median imputation:** median is robust to skew/outliers relative to the mean, but the choice is still a modelling decision. If the median is calculated before splitting, information from test data enters preprocessing.
+- **`pclass`:** numeric values 1, 2, 3 imply an ordered representation and a particular geometry. One-hot encoding is an alternative when the equal-spacing assumption is undesirable.
+- **`sibsp` and `parch`:** counts are discrete and often skewed. Standardizing them may be reasonable, but it changes interpretability; the project chose to scale continuous `age` and `fare` in the simpler teaching setup.
+- **`fare`:** strongly skewed values can make standardization sensitive to outliers; a log transform could be tested later, but it should not be introduced while diagnosing a different bug.
+- **`sex`:** one indicator suffices for two categories. The meaning of 0/1 depends on category ordering; check the resulting column name and mapping instead of assuming which sex equals one.
+- **DataFrame column order:** model weights correspond to input positions. Persist the exact feature order for inference and ensure it is identical at training and prediction time.
+
+### AA.4 Model size and reported results
+
+Two discussed model capacities were:
+- `6 → 4 → 1`: 33 parameters.
+- `6 → 16 → 8 → 1`: 257 parameters.
+
+In the 33-parameter architecture, the first layer computes four hidden features from six inputs, ReLU supplies nonlinearity, and the output layer produces one logit. It is deliberately small and is useful for showing the relationship between capacity and fit.
+
+Reported observations across iterations included training accuracy around 86–87% and test accuracy around 75–82%, plus a later compact-model result near 87.77%. The source discussion moved through multiple fixes and model variants. Do not claim one is the final best result without reopening the actual notebook.
+
+### AA.5 What the reported confusion matrix says
+
+One recorded matrix was:
+
+\[
+\begin{bmatrix}
+403 & 36\\
+72 & 201
+\end{bmatrix}
+\]
+
+Assuming rows are actual classes `[0,1]` and columns predicted classes `[0,1]`, this gives:
+- TN = 403
+- FP = 36
+- FN = 72
+- TP = 201
+- total = 712
+- accuracy \(=(403+201)/712\approx84.83\%\)
+- precision for class 1 \(=201/(201+36)\approx84.81\%\)
+- recall for class 1 \(=201/(201+72)\approx73.63\%\)
+- F1 for class 1 \(\approx78.83\%\)
+
+**Caveat:** this matrix's total equals 712, the documented training-set size, not the 179-row test split. It may therefore be a training-set evaluation or another split/context. Never label it as test performance without verifying the code that generated it. This is an important example of why a plausible-looking metric is not enough: the evaluated population matters.
+
+### AA.6 Debugging sequence for the Titanic run
+
+When results looked odd, the discussion narrowed the problem in this order:
+1. Inspect the data and feature matrix shapes.
+2. Verify target shape/dtype and output shape.
+3. Confirm the loss expects logits rather than probabilities.
+4. Confirm scaling was fitted on training data and applied to both sets.
+5. Confirm evaluation uses `model.eval()` and `torch.no_grad()`.
+6. Print loss at sensible intervals and inspect the learning curve.
+7. Compare training and test performance.
+8. Check number of epochs and learning rate.
+9. Compare against a simpler baseline/logistic regression.
+10. Change one variable at a time.
+
+The source explicitly discouraged assuming the model architecture was at fault before verifying the data and evaluation pipeline.
+
+## AB. Binary loss and output-head contracts in detail
+
+### AB.1 `BCELoss` versus `BCEWithLogitsLoss`
+
+`BCELoss` expects probabilities \(p\in[0,1]\). If the model returns logits \(z\), one would need a sigmoid first:
+
+```python
+probabilities = torch.sigmoid(logits)
+loss = torch.nn.BCELoss()(probabilities, targets)
+```
+
+`BCEWithLogitsLoss` takes logits directly and combines sigmoid with BCE using a numerically stable formulation:
+
+```python
+loss = torch.nn.BCEWithLogitsLoss()(logits, targets)
+```
+
+The second pattern is generally preferred. If sigmoid is applied in `forward()` and the result is then passed to `BCEWithLogitsLoss`, sigmoid is effectively applied twice, producing incorrect loss semantics.
+
+### AB.2 Derivative intuition for binary cross-entropy with logits
+
+For a single target \(y\) and logit \(z\), the sigmoid/BCE combination has the particularly clean derivative
+
+\[
+\frac{\partial L}{\partial z}=\sigma(z)-y.
+\]
+
+This is one reason logits are a natural output representation: the gradient directly compares predicted probability with the target. It also helps explain why the model can receive a useful gradient when it is confidently wrong, although extreme floating-point values still require stable implementations.
+
+### AB.3 `pos_weight` and class imbalance
+
+`BCEWithLogitsLoss` supports `pos_weight` to increase the contribution of positive examples. It changes the objective and often shifts the precision/recall trade-off; it is not a free correction that leaves the meaning of predicted probabilities unchanged. Select it based on the problem's error costs and validation evidence, and evaluate threshold/calibration behaviour after training.
+
+### AB.4 Reduction and multi-label classification
+
+For a multi-label task, output shape is often `(B, C)` with independent binary targets per class and BCE-with-logits. This differs from multiclass single-label classification, where classes are mutually exclusive and `CrossEntropyLoss` is typical. Do not choose a loss based solely on the number of output units; choose it based on the target semantics.
+
+## AC. Evaluation: beyond accuracy
+
+### AC.1 Confusion-matrix orientation must be documented
+
+Libraries and plotting helpers differ in presentation conventions, although scikit-learn's standard `confusion_matrix(y_true, y_pred)` uses rows for true classes and columns for predicted classes. Before interpreting a matrix, state the class order and orientation. For binary labels ordered `[0,1]`, the usual layout is `[[TN, FP], [FN, TP]]`.
+
+### AC.2 Precision, recall, specificity, and F1
+
+\[
+\text{Precision}=\frac{TP}{TP+FP},\quad
+\text{Recall/Sensitivity}=\frac{TP}{TP+FN},
+\]
+\[
+\text{Specificity}=\frac{TN}{TN+FP},\quad
+F_1=\frac{2TP}{2TP+FP+FN}.
+\]
+
+- Precision matters when false positives are costly.
+- Recall matters when missing a true positive is costly.
+- Specificity measures how well actual negatives are rejected.
+- F1 is the harmonic mean of precision and recall; it does not incorporate true negatives directly and should not be treated as a universal metric.
+- Macro averaging gives each class equal weight; weighted averaging weights by class support; micro averaging aggregates counts before computing the metric. They answer different questions.
+
+### AC.3 ROC and precision-recall curves
+
+A ROC curve plots true-positive rate against false-positive rate as the threshold changes. ROC AUC summarizes ranking performance across thresholds but can look optimistic under severe class imbalance. A precision-recall curve focuses on the positive class and is often more informative when positives are rare. Neither curve identifies the operational threshold without costs or constraints.
+
+### AC.4 Calibration
+
+A classifier is calibrated when predictions assigned probability \(p\) correspond to approximately \(p\) empirical event frequency among comparable cases. Accuracy and ranking metrics do not guarantee calibration. If probabilities are used for decisions, risk estimation, or thresholding, calibration should be checked separately.
+
+### AC.5 Undefined values are part of the metric specification
+
+When a denominator is zero, the ratio is mathematically undefined. Libraries may map the result to zero, one, or `NaN`, or warn, depending on the metric and configuration. Store both:
+- the mathematical condition (e.g. no predicted positives);
+- the software policy used to report a number.
+
+This is preferable to saying the metric “equals zero” without qualification.
+
+## AD. Underfitting, overfitting, and model capacity
+
+### AD.1 Training/validation patterns
+
+| Training loss | Validation loss | Typical interpretation |
+|---|---|---|
+| High and still high | High | Underfitting, optimization failure, or poor features |
+| Decreasing | Decreasing | Learning useful structure so far |
+| Decreasing | Flat | Generalization improvement has stalled |
+| Decreasing | Increasing | Overfitting may be emerging |
+| Erratic | Erratic | Small/unstable validation set, excessive learning rate, noisy optimization, or pipeline problems |
+
+These are diagnostic patterns, not proofs. Data leakage, distribution shift, inconsistent preprocessing, incorrect model mode, and noisy labels can produce misleading curves.
+
+### AD.2 Capacity and regularization sequence in the Titanic notebook
+
+The recorded narrative was:
+1. a simple model underfit;
+2. a model with hidden layers fit training data better;
+3. validation/test behaviour exposed overfitting;
+4. weight decay slowed fitting and improved the held-out loss curve in one run;
+5. early stopping was proposed as the next concept to discover from the validation-loss curve.
+
+The point is not that every model must follow this exact progression, but that the project deliberately used the same dataset to make model capacity and generalization visible.
+
+### AD.3 Bias–variance framing
+
+A high-bias model cannot express important structure; a high-variance model changes too much with the particular training sample. Increasing capacity can reduce approximation error while increasing sensitivity to the data. Regularization, more data, augmentation, and appropriate model selection can alter this trade-off. The familiar bias–variance decomposition is exact under particular assumptions (e.g. squared-error regression), so do not treat it as a universal literal decomposition of every classification error.
+
+## AE. Optimizer details beyond the basic formulas
+
+### AE.1 Gradient direction versus step magnitude
+
+For Adam,
+
+\[
+\Delta\theta_t \approx -\eta\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}.
+\]
+
+The first-moment estimate \(\hat m_t\) smooths the signed gradient history. The second-moment estimate \(\hat v_t\) scales coordinates according to recent squared-gradient magnitude. It is useful to say that Adam smooths direction and adapts magnitude, but the two roles are coupled by coordinate-wise normalization; they are not a perfect orthogonal decomposition into direction and magnitude.
+
+### AE.2 Epsilon placement matters
+
+The common expression places \(\epsilon\) outside the square root:
+
+\[
+\sqrt{\hat v_t}+\epsilon.
+\]
+
+Different algorithms or implementations can use different placements or conventions. When explaining exact optimizer behaviour, use the specific algorithm/API formula rather than treating all adaptive methods as algebraically identical.
+
+### AE.3 Weight decay and parameter groups
+
+In real networks, weight decay is often not applied uniformly:
+- biases may be excluded;
+- normalization parameters may be excluded;
+- weights may use one decay value while other parameters use another;
+- pretrained backbone and newly initialized head may use different learning rates.
+
+These are common implementation practices, not a project-wide settled rule. Record the optimizer parameter groups explicitly when comparing runs.
+
+### AE.4 Schedulers and warmup
+
+A learning-rate scheduler changes \(\eta\) over training:
+- step decay lowers it at selected epochs;
+- exponential decay multiplies it by a factor each step/epoch;
+- cosine schedules reduce it smoothly;
+- warmup begins at a low rate and increases toward the target rate over an initial interval.
+
+Warmup can reduce instability early in training, especially with large models or large effective batch sizes. It does not compensate for incorrect labels, normalization, loss contracts, or a broken optimizer parameter group.
+
+## AF. Convolution arithmetic and computational cost
+
+### AF.1 Output-size formula
+
+For one spatial dimension,
+
+\[
+L_{\text{out}}=
+\left\lfloor
+\frac{L_{\text{in}}+2P-D(K-1)-1}{S}+1
+\right\rfloor.
+\]
+
+Use this for height and width separately. For a common 3×3 convolution with stride 1, padding 1, dilation 1, spatial size is preserved. For stride 2, spatial size is approximately halved depending on padding and input parity.
+
+### AF.2 Parameters versus operations
+
+Parameter count does not directly predict runtime:
+- convolutional weights are reused at many spatial positions;
+- activation tensors may be large even when parameter count is small;
+- input resolution affects convolutional multiply-accumulate operations;
+- batch size changes activation memory and throughput;
+- memory bandwidth, kernel launch overhead, data loading, precision, and hardware also matter.
+
+This distinction was relevant to the transfer-learning experiment: 224×224 inputs were much more expensive than 32×32 inputs, despite using the same backbone weights.
+
+### AF.3 Why flattening an image into a dense layer is expensive
+
+For a 224×224 RGB image, the raw flattened input has \(224\cdot224\cdot3=150{,}528\) values. A dense layer from this input to 512 units would require \(150{,}528\cdot512+512\) parameters—over 77 million—whereas a convolution shares a small kernel across locations. This is a mathematical illustration, not a layer that the project necessarily instantiated.
+
+### AF.4 Global average pooling
+
+Global average pooling averages each feature map over its spatial dimensions, converting `(B, C, H, W)` into `(B, C)` in a common implementation. It can replace a large flatten-and-dense head, reducing parameters and encouraging the channel activations to represent image-level evidence. It may reduce spatially detailed information, and the exact use depends on architecture.
+
+## AG. ResNet internals and feature transfer
+
+### AG.1 Residual addition requires compatible shapes
+
+For \(y=F(x)+x\), the tensor shapes must match. If spatial size or channel count changes, the skip path uses a projection or another alignment operation. A 1×1 convolution can change channels; stride can change spatial resolution. This is a structural constraint, not an optional detail.
+
+### AG.2 Basic block and bottleneck arithmetic
+
+A basic block commonly has two 3×3 convolutions. A bottleneck commonly uses 1×1 reduction, 3×3 processing, and 1×1 expansion. The bottleneck's internal width is smaller than its output width, reducing the cost of the spatial convolution. ResNet-50 uses bottleneck blocks; ResNet-18 uses basic blocks.
+
+### AG.3 Freezing a backbone
+
+Setting `requires_grad=False` on backbone parameters prevents gradients from being accumulated for those parameters, but it does not automatically:
+- switch BatchNorm layers to evaluation behaviour;
+- disable Dropout if present;
+- prevent the forward pass from constructing every possible graph node in all configurations;
+- guarantee the feature distribution matches the new task.
+
+For a frozen feature extractor, many implementations call the backbone in eval mode and train only the new head. Whether BatchNorm statistics should remain frozen depends on dataset size and domain shift; make the decision explicit.
+
+### AG.4 Fine-tuning gradually
+
+A common strategy is:
+1. load pretrained weights;
+2. replace the classification head;
+3. train the new head with the backbone frozen;
+4. unfreeze later/high-level backbone stages;
+5. use a smaller learning rate for pretrained weights than for the new head;
+6. validate whether the additional trainable capacity improves held-out performance.
+
+This is a useful protocol, not proof that gradual unfreezing is always optimal. A fully frozen backbone can fail because its representation is mismatched to the task; fine-tuning can help, but can also overfit or destroy useful pretrained features if the learning rate is too large.
+
+## AH. Transfer-learning experiment: recorded configuration and implications
+
+### AH.1 Configuration captured in project context
+
+The separate transfer-learning experiment used:
+- a pretrained `timm` ResNet-18;
+- Fashion-MNIST as the target dataset;
+- grayscale images converted to three channels;
+- input resize to 32×32;
+- the original ImageNet classification head discarded;
+- a new `Linear(512, 10)` classification head;
+- the backbone initially frozen.
+
+A critical missing preprocessing step was identified: ImageNet-style normalization. The expected channel-wise values for common ImageNet-pretrained models are
+
+```python
+mean = [0.485, 0.456, 0.406]
+std  = [0.229, 0.224, 0.225]
+```
+
+The normalization must be applied after converting/resizing the image into the appropriate tensor representation. Check the specific model's preprocessing configuration rather than assuming every checkpoint uses these values.
+
+### AH.2 Why three channels do not create RGB information
+
+Replicating a grayscale channel produces three numerically identical channels. It satisfies an RGB-shaped input contract, but the channels are perfectly correlated and contain no additional chromatic information. The model's pretrained first-layer filters were learned on natural RGB images, so the representation mismatch remains even when the tensor shape is accepted.
+
+### AH.3 Why 32×32 versus 224×224 is not a trivial choice
+
+The pixel-area ratio is
+
+\[
+\frac{224^2}{32^2}=49.
+\]
+
+Thus, at the same batch size and comparable architecture, early spatial feature maps can be much more expensive at 224×224. The source discussion recorded approximately 4.5–5 hours per epoch for a 224×224 setup, while 32×32 was used to make the experiment feasible. That runtime is hardware/configuration-specific. A 32×32 input is valid only if the chosen architecture's stem and later layers support it; pretrained weights do not themselves require 224×224 as a mathematical law.
+
+### AH.4 Recorded performance and the likely diagnosis
+
+The frozen-backbone experiment produced roughly 70% train/test accuracy in one discussion. The missing ImageNet normalization was identified as a major pipeline problem. A subsequent proposed experiment unfroze `layer4` and trained the head with Adam at `lr=1e-4`; a one-epoch result was recorded as training loss about 0.9427, validation loss about 0.6456, and accuracy about 0.7926.
+
+Do not infer a final conclusion from a single epoch. The next checks are:
+- confirm preprocessing matches the checkpoint;
+- verify train/eval modes and BatchNorm behaviour;
+- verify the new head is trainable and included in the optimizer;
+- inspect per-epoch train/validation curves;
+- compare frozen and fine-tuned runs under identical splits;
+- establish the class-index mapping and evaluation code.
+
+### AH.5 Normalization is part of the model contract
+
+Pretrained weights were optimized for a particular input distribution. Scaling pixels to `[0,1]` and then applying channel-wise standardization are separate operations. Using the wrong mean/std, skipping normalization, normalizing twice, or applying normalization in a different order shifts the input distribution. A shape-compatible tensor is not necessarily a semantically compatible input.
+
+## AI. Instrumentation and TensorBoard: observed failure modes
+
+This topic was recorded in project discussions and is useful because logging itself became a source of performance and diagnostic problems.
+
+### AI.1 Logging overhead can dominate a small model
+
+A small Iris network has only 123 trainable parameters. The discussion observed that per-epoch TensorBoard diagnostics could create roughly 70–100 logging operations, enough for instrumentation to dominate the actual training work. The recommended separation was:
+
+- **FastLogger:** scalar metrics and essential values every epoch.
+- **DiagnosticLogger:** heavier diagnostics every 25–100 epochs.
+- **ArtifactLogger:** expensive artifacts infrequently.
+
+The precise interval should be chosen according to model size, runtime, and diagnostic need. A tiny model may spend more time serializing/logging than computing gradients.
+
+### AI.2 Histograms and event-file growth
+
+A TensorBoard event file grew to approximately 260 MB in a run. The discussion attributed this primarily to excessive histogram logging. Histograms of weights, activations, or gradients can be useful for diagnosing saturation, dead units, or exploding values, but writing them every epoch across many tensors produces substantial I/O and storage.
+
+A safe debugging sequence is:
+1. create a clean run directory;
+2. test scalar-only logging;
+3. confirm steps are monotonic;
+4. add one histogram family;
+5. inspect file growth;
+6. add more diagnostics only if they answer a concrete question.
+
+### AI.3 Out-of-order steps and nested runs
+
+TensorBoard showed out-of-order steps in connection with a nested `add_hparams()` run. Keep each run's event stream and global-step sequence coherent. `add_hparams()` can create an additional run/logging structure; inspect the generated directory hierarchy instead of assuming all tags share one simple step series. Do not mix runs in a way that makes the displayed curves look like a single continuous experiment.
+
+### AI.4 Reproducibility metadata
+
+At minimum, record:
+- model and hyperparameters;
+- dataset split/random seed;
+- preprocessing configuration;
+- optimizer and parameter groups;
+- learning-rate schedule;
+- batch size and epoch count;
+- library/device versions where relevant;
+- best checkpoint and selected epoch;
+- metrics on train/validation/test;
+- source code or commit identifier.
+
+A plot without the configuration that generated it is difficult to interpret later.
+
+## AJ. Dataset splits and leakage beyond the Titanic example
+
+### AJ.1 Split the independent unit, not automatically the row
+
+If rows are correlated—multiple windows from one recording, repeated measurements from one device, multiple images of the same object, or multiple records from the same person—the split should usually occur at the level of the independent source. Random row-level splitting can put near-duplicates into both train and validation.
+
+### AJ.2 Split before generating overlapping windows
+
+For audio windows of length 2 seconds and stride 1 second, adjacent windows share half their signal. If a recording is segmented first and windows are randomly divided, the model may see nearly the same acoustic material in training and validation. The project voice-classifier discussion explicitly identified this as a major leakage risk.
+
+Correct order:
+
+```text
+Original recordings
+       ↓
+Split by recording/session/speaker as appropriate
+       ↓
+Segment each split independently
+       ↓
+Generate spectrograms
+       ↓
+Train / validate / test
+```
+
+The independent grouping depends on the intended deployment question. If the aim is to generalize to new recording sessions of known speakers, split by session. If the aim is to generalize to unseen speakers, split by speaker. The test design must match the claim.
+
+### AJ.3 Leakage through preprocessing
+
+Leakage can occur through:
+- scaler or imputer statistics fit on all rows;
+- feature selection on the full dataset;
+- PCA fitted before splitting;
+- oversampling before splitting;
+- augmentation variants of the same source appearing in different splits;
+- target-derived or future information in features;
+- repeated hyperparameter tuning against the test set.
+
+The remedy is not just “use train/test split.” It is to ensure every data-dependent choice is learned from training data or validation data only, with the final test set held back until selection is complete.
+
+## AK. Audio preprocessing: more technical details
+
+### AK.1 Sampling rate and Nyquist limit
+
+A digital audio waveform sampled at \(f_s\) samples per second can represent frequencies below approximately \(f_s/2\), the Nyquist frequency, subject to filtering and real-world details. At 48 kHz the nominal Nyquist limit is 24 kHz; at 16 kHz it is 8 kHz. Downsampling therefore removes frequency content above the lower Nyquist limit and requires anti-alias filtering.
+
+### AK.2 Windowing and overlap
+
+For a 2-second segment at 16 kHz, each mono waveform window contains 32,000 samples. With a 1-second stride, the hop between windows is 16,000 samples and adjacent windows overlap by 16,000 samples. If stereo is present, decide whether to preserve channels or downmix to mono consistently.
+
+### AK.3 Spectrogram parameters are part of the feature definition
+
+A spectrogram is not uniquely defined by the word “spectrogram.” Important choices include:
+- FFT/window length;
+- hop length;
+- window function;
+- magnitude versus power;
+- log magnitude/log power;
+- frequency range;
+- centering and padding;
+- normalization;
+- image resizing and channel conversion.
+
+Changing these changes the model's input distribution. Store them as configuration alongside the model checkpoint.
+
+### AK.4 Segment-level versus recording-level metrics
+
+If many windows are extracted from one recording, computing accuracy across all windows weights long recordings more heavily. It can also give a misleading sense of sample size because windows are correlated. Depending on the deployment objective, aggregate predictions by recording or report both window-level and recording-level metrics. Confidence intervals should account for the grouping structure where feasible.
+
+## AL. Classical ML comparison and baselines
+
+### AL.1 Why compare an MLP with logistic regression?
+
+The logistic-regression baseline has a direct linear decision boundary in the encoded feature space. An MLP with hidden nonlinear layers can express more complex boundaries, but adds parameters and optimization complexity. If the MLP does not outperform logistic regression on validation data, possible explanations include:
+- the relationship is nearly linear;
+- data size is too small for the added capacity;
+- regularization/optimization is suboptimal;
+- features are weak or noisy;
+- the comparison is not controlled.
+
+A more complex model is not automatically better.
+
+### AL.2 Majority-class baseline
+
+For a binary dataset with class proportion \(p\), always predicting the majority class achieves accuracy \(\max(p,1-p)\). This baseline can look strong on imbalanced data while having zero recall for the minority class. Report the class distribution and at least one baseline before celebrating a model's accuracy.
+
+### AL.3 Baseline comparisons must share the pipeline
+
+Models should use the same train/validation/test split and comparable feature information. If one model receives a differently processed dataset or has its threshold tuned on test data, the comparison is not fair.
+
+## AM. Numerical precision, device, and runtime notes
+
+### AM.1 Floating-point types
+
+- `float32` is a common training dtype and balances precision, memory, and speed.
+- `float64` can help with numerical checks and some sensitive calculations but is slower and more memory-intensive on many GPUs.
+- Integer targets are appropriate for class indices in `CrossEntropyLoss`; binary BCE targets are usually floating-point values matching the output shape.
+- Converting data to the wrong dtype can cause an error or silently alter semantics.
+
+### AM.2 GPU availability does not guarantee acceleration
+
+Small models and small datasets may run faster on CPU because transfer and kernel-launch overhead dominate. Large images, convolutions, and larger batches are more likely to benefit from a GPU. Benchmark a representative complete epoch, including data loading and preprocessing, rather than timing only the forward pass.
+
+### AM.3 Reproducibility is layered
+
+Setting `random_state` or a PyTorch seed is necessary for repeatable experiments but may not be sufficient. DataLoader workers, nondeterministic kernels, library versions, GPU architecture, and parallel reductions can affect exact results. Record the seed and environment, and distinguish “same experimental setup” from bitwise-identical results.
+
+## AN. Model outputs and inference contracts
+
+### AN.1 Training output versus user-facing output
+
+A model's raw output is not always the final result:
+- regression: output may be the prediction in the target's scale;
+- binary classification: one logit, optionally converted to a probability;
+- multiclass classification: \(K\) logits, optionally converted to probabilities;
+- multi-label classification: one logit per independent label.
+
+If the target was standardized or transformed, predictions may need an inverse transform before being reported in original units. If categorical values were encoded, inference must apply the same mapping as training.
+
+### AN.2 Persist preprocessing with the model
+
+Saving only model weights is insufficient if inference also depends on:
+- feature order;
+- categorical mapping;
+- imputation values;
+- scaler mean and scale;
+- image normalization;
+- audio resampling and spectrogram parameters;
+- class-to-index mapping;
+- decision threshold.
+
+These are part of the model artifact. A model can load successfully and still give invalid predictions if the preprocessing contract is lost.
+
+## AO. Research and architecture timeline: technical interpretation
+
+The project's historical survey touched perceptrons, early neural-network limitations, backpropagation, convolutional networks, AlexNet-era deep learning, transformers, and LLMs. The useful technical distinctions are:
+
+- A **perceptron** with a threshold activation learns a linear decision boundary; a single perceptron cannot solve non-linearly separable XOR.
+- A **multilayer network** introduces intermediate representations and nonlinear composition, allowing nonlinear boundaries.
+- **Backpropagation** made gradient calculation through layered compositions practical; it is an algorithm for derivatives, not by itself a guarantee of good optimization.
+- **CNNs** exploit local structure and weight sharing in spatial data.
+- **Residual connections** improve optimization in deep networks by providing identity-like paths.
+- **Transformers** use attention and feed-forward blocks rather than recurrence as their primary sequence-mixing mechanism; positional information must be supplied or learned because plain self-attention alone is permutation-equivariant over token positions.
+- **LLMs** are trained with large-scale objectives and data; next-token prediction is a core pretraining objective, but instruction tuning, preference optimization, retrieval, tool use, and inference-time decoding are separate components.
+
+These statements are technical orientation, not a claim that every listed architecture has already been taught in the course.
+
+## AP. Consolidated equations sheet
+
+### Regression
+\[
+\hat y=wx+b
+\]
+\[
+\operatorname{MSE}=\frac1N\sum_i(y_i-\hat y_i)^2
+\]
+\[
+w\leftarrow w-\eta\frac{\partial L}{\partial w}
+\]
+
+### Linear layer
+\[
+Y=XW^\top+b,\qquad
+P=n_{\text{in}}n_{\text{out}}+n_{\text{out}}
+\]
+
+### Binary classification
+\[
+p=\sigma(z)=\frac1{1+e^{-z}}
+\]
+\[
+L_{\text{BCE}}=-[y\log p+(1-y)\log(1-p)]
+\]
+\[
+\frac{\partial L}{\partial z}=\sigma(z)-y
+\quad\text{(single example, unweighted BCE)}
+\]
+
+### Multiclass classification
+\[
+p_k=\frac{e^{z_k}}{\sum_j e^{z_j}},\qquad
+L=-\log p_y
+\]
+
+### Metrics
+\[
+P=\frac{TP}{TP+FP},\quad
+R=\frac{TP}{TP+FN},\quad
+F_1=\frac{2TP}{2TP+FP+FN}
+\]
+
+### L2 objective
+\[
+J(\theta)=L(\theta)+\lambda\|\theta\|_2^2,\qquad
+\nabla J=\nabla L+2\lambda\theta
+\]
+
+### Momentum / Adam
+\[
+v_t=\beta v_{t-1}+g_t,\qquad \theta_{t+1}=\theta_t-\eta v_t
+\]
+\[
+m_t=\beta_1m_{t-1}+(1-\beta_1)g_t
+\]
+\[
+v_t=\beta_2v_{t-1}+(1-\beta_2)g_t^2
+\]
+\[
+\theta_{t+1}=\theta_t-\eta\frac{\hat m_t}{\sqrt{\hat v_t}+\epsilon}
+\]
+
+### CNN output size
+\[
+L_{\text{out}}=
+\left\lfloor\frac{L_{\text{in}}+2P-D(K-1)-1}{S}+1\right\rfloor
+\]
+
+### Residual block
+\[
+y=F(x)+x
+\quad\text{or}\quad
+y=F(x)+W_sx
+\]
+
+### Audio RMS
+\[
+\operatorname{RMS}(x)=\sqrt{\frac1N\sum_nx_n^2}
+\]
+
+## AQ. Practical pre-flight checklist before trusting a result
+
+Before interpreting a metric or changing an architecture, verify:
+
+1. **Data identity:** which exact dataset and rows/files were used?
+2. **Split unit:** are correlated samples kept together?
+3. **Leakage:** were all data-dependent preprocessing steps fit on training data only?
+4. **Feature contract:** exact columns, order, encoding, units, missing-value treatment?
+5. **Shape contract:** input, logits, and target dimensions match?
+6. **Dtype contract:** float targets for BCE; integer class indices for ordinary cross-entropy?
+7. **Output/loss contract:** logits versus probabilities correct?
+8. **Optimizer contract:** all intended parameters included, correct learning rates and decay groups?
+9. **Mode contract:** `train()` during training, `eval()` during evaluation?
+10. **Gradient contract:** gradients cleared, backward called, optimizer stepped?
+11. **Metric contract:** correct class mapping, matrix orientation, zero-denominator convention?
+12. **Baseline:** majority class or simpler model reported?
+13. **Selection contract:** validation used for tuning, test held back?
+14. **Reproducibility:** split seed, model configuration, preprocessing, and checkpoint recorded?
+15. **Runtime contract:** timing includes data loading and logging, not only model computation?
+16. **Artifact contract:** weights and preprocessing configuration saved together?
+
+## AR. Source provenance and confidence
+
+The technical notes in the two appendices draw primarily from the project export and the specific experiment discussions it contains. The following distinctions should survive future edits:
+
+- **Recorded configurations:** Iris `4→10→5→3`; Titanic six-feature binary MLPs; audio windows of 2 seconds with 1-second stride; pretrained `timm` ResNet-18 on Fashion-MNIST; TensorBoard logging overhead observations.
+- **Recorded values from particular runs:** Titanic accuracy/loss/confusion-matrix examples; voice-classifier validation accuracy range; transfer-learning epoch timing and one-epoch metrics; TensorBoard event-file size. These are contextual observations, not general performance claims.
+- **Derived values:** parameter counts, tensor shapes, metrics calculated from the given confusion matrix, and pixel-area ratios.
+- **General reference additions:** finite-difference checks, Hessian conditioning, ROC/PR interpretation, calibration, `pos_weight`, scheduler details, convolution arithmetic, and several inference-contract recommendations. These are standard technical context and are not all documented as decisions in the project.
+- **Unresolved:** the final state of the transfer-learning notebook, the definitive best Titanic run, and any implementation detail that depends on code after the export. Reopen the actual notebook rather than inferring a final answer from this document.
+
+The original project files remain authoritative when this appendix and executable code disagree.
