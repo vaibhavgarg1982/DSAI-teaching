@@ -389,3 +389,4 @@ Target Python in this project: `>=3.14`.
 | [arXiv:1812.01187](https://arxiv.org/pdf/1812.01187.pdf) | Bag of Tricks for Image Classification with Convolutional Neural Networks |
 | [arXiv:1710.09412](https://arxiv.org/pdf/1710.09412.pdf) | mixup: Beyond Empirical Risk Minimization |
 | [arXiv:1911.02685](https://arxiv.org/pdf/1911.02685.pdf) | comprehensive survey on Transfer Learning |
+| [Nature Paper](https://www.nature.com/articles/nature14539) | Deep Learning |
